@@ -32,6 +32,10 @@
     
 }
 
+.btnsPaginaPrincipal button:hover {
+    border: 2px solid #571f1f;
+}
+
 .containerPaginaPrincipal2 {
     display: flex;
     align-items: center;
