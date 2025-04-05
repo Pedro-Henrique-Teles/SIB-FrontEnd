@@ -1,13 +1,9 @@
-import Cabecalho from "../cabecalho/Cabecalho";
-import PaginaPrincipal from "../paginaPrincipal/PaginaPrincipal";
-
 function Home() {
-    return (
-      <>
-        <Cabecalho />
-        <PaginaPrincipal />
-      </>
-    )
-  }
-  
-  export default Home;
+  return (
+    <div>
+      <h1 className="text-6xl text-center bg-black text-white p-7 mt-5">Teste</h1>
+    </div>
+  );
+}
+
+export default Home;
