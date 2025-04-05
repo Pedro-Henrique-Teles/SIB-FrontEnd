@@ -1,5 +1,3 @@
-import { color } from 'framer-motion';
-
 /** @type {import('tailwindcss').Config} */
 const {heroui} = require("@heroui/react");
 export default {
