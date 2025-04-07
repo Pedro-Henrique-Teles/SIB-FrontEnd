@@ -35,7 +35,7 @@ export default function Cabecalho() {
         <NavbarBrand>
           <Image
             alt="Logo Sib"
-            src="/cabecalhoImgs/logoSibBranca.png"
+            src="/img/logoSibBranca.png"
             width={70}
           />
         </NavbarBrand>
@@ -82,7 +82,7 @@ export default function Cabecalho() {
         <NavbarItem className="flex">
           <Image
             alt="Logo Sib"
-            src="/cabecalhoImgs/instagramIcon.png"
+            src="/img/instagramIcon.png"
             width={30}
           />
         </NavbarItem>
