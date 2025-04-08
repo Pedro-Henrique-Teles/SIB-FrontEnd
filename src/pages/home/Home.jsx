@@ -1,10 +1,11 @@
 import Pagina5 from "../../components/Pagina5";
 
+import Cabecalho from "../../components/ui/Cabecalho";
 
 function Home() {
   return (
     <div>
-      <Pagina5 />
+      <Cabecalho />
     </div>
   );
 }
