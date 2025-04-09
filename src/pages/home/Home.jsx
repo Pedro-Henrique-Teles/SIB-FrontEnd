@@ -1,5 +1,5 @@
 import Cabecalho from "../../components/ui/Cabecalho";
-import PaginaPrincipal from "../../components/ui/PaginaPrincipal";
+import PaginaPrincipal from "./PaginaPrincipal";
 
 function Home() {
   return (
