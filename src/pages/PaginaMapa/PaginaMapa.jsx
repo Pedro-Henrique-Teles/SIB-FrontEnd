@@ -1,3 +1,8 @@
+import React from 'react'
+import { MapContainer, TileLayer } from 'react-leaflet'
+import "leaflet/dist/leaflet.css"
+import "./styles.css"
+
 const PaginaMapa = () => {
 
 
@@ -5,9 +10,13 @@ const PaginaMapa = () => {
 
     return (
         <div>
-            <div className="flex items-center justify-center text-9x1 h-[400px]">
-                MAPA
-            </div>
+            <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false} className="h-[600px] w-screen z-10">
+                <TileLayer 
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={[51.505, -0.09]}></Marker>
+            </MapContainer>
             <div className="bg-black h-[300px] text-white flex items-center justify-center gap-[40px]">
                 <div className="w-[612px] h-[140px] flex flex-col items-center justify-center border border-solid border-white ">
                     <h1>Contato</h1>
