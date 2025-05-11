@@ -4,7 +4,6 @@ import Home from "../pages/home/Home";
 import { Pagina03 } from "../components/Pagina03";
 import { Pagina04 } from "../components/Pagina04";
 
-
 const AppRoutes = () => {
   return (
     <Routes>

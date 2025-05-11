@@ -1,11 +1,13 @@
 
+import Cabecalho from "../../components/ui/Cabecalho";
+import PaginaPrincipal from "./PaginaPrincipal";
 
 function Home() {
   return (
     <div>
-      <h1 className="text-6xl text-center bg-black text-white p-7 mt-5">Teste</h1>
+      <Cabecalho />
+      <PaginaPrincipal />
     </div>
   );
 }
-
-export default Home;
+export default Home
