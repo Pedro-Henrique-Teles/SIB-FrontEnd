@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -7,20 +7,22 @@ import {
   NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
-  Link,
   Button,
-  Image
+  Image,
 } from "@heroui/react";
+import { Link } from "react-router-dom";
+import { FaInstagram } from "react-icons/fa";
 
-export default function Cabecalho() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
+export const Cabecalho = ({ irParaOTopo, scrollToSection, refs }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const urlInstagram =
+    "https://www.instagram.com/sib.jf?igsh=dmsxOTExNzRuYTNm&utm_source=qr";
   const menuItems = [
     "Programação",
     "Sobre",
     "Visão",
-    "Missão",
     "Valores",
+    "Galeria",
     "História",
     "Contato",
   ];
@@ -34,8 +36,9 @@ export default function Cabecalho() {
         />
         <NavbarBrand>
           <Image
+            onClick={() => irParaOTopo()}
             alt="Logo Sib"
-            src="/img/logoSibBranca.png"
+            src="/img/icons/logoSibBranca.png"
             width={70}
           />
         </NavbarBrand>
@@ -43,69 +46,121 @@ export default function Cabecalho() {
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
-          <Link className="text-white" href="#">
+          <Button
+            className="text-white bg-transparent font-bold text-sm"
+            onPress={() => scrollToSection(refs.programacaoRef)}
+          >
             Programação
-          </Link>
+          </Button>
         </NavbarItem>
         <NavbarItem>
-          <Link className="text-white" href="#">
+          <Button
+            className="text-white bg-transparent font-bold text-sm"
+            onPress={() => scrollToSection(refs.sobreRef)}
+          >
             Sobre
-          </Link>
+          </Button>
         </NavbarItem>
         <NavbarItem>
-          <Link className="text-white" href="#">
+          <Button
+            className="text-white bg-transparent font-bold text-sm"
+            onPress={() => scrollToSection(refs.visaoRef)}
+          >
             Visão
-          </Link>
+          </Button>
         </NavbarItem>
         <NavbarItem>
-          <Link className="text-white" href="#">
-            Missão
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link className="text-white" href="#">
+          <Button
+            className="text-white bg-transparent font-bold text-sm"
+            onPress={() => scrollToSection(refs.valoresRef)}
+          >
             Valores
-          </Link>
+          </Button>
         </NavbarItem>
         <NavbarItem>
-          <Link className="text-white" href="#">
-            História
-          </Link>
+          <Button
+            className="text-white bg-transparent font-bold text-sm"
+            onPress={() => scrollToSection(refs.galeriaRef)}
+          >
+            Galeria
+          </Button>
         </NavbarItem>
         <NavbarItem>
-          <Link className="text-white" href="#">
+          <Button
+            className="text-white bg-transparent font-bold text-sm"
+            onPress={() => scrollToSection(refs.historiaRef)}
+          >
+            Historia
+          </Button>
+        </NavbarItem>
+        <NavbarItem>
+          <Button
+            className="text-white bg-transparent font-bold text-sm"
+            onPress={() => scrollToSection(refs.contatoRef)}
+          >
             Contato
-          </Link>
+          </Button>
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
-        <NavbarItem className="flex">
-          <Image
-            alt="Logo Sib"
-            src="/img/instagramIcon.png"
-            width={30}
-          />
-        </NavbarItem>
         <NavbarItem>
-          <Button as={Link} className="text-white bg-black border" href="#" variant="flat">
+          <Button
+            as={Link}
+            className="text-white bg-black border"
+            href="#"
+            variant="flat"
+            onPress={() => scrollToSection(refs.formRef)}
+          >
             Eu sou novo
           </Button>
+        </NavbarItem>
+        <NavbarItem>
+          <NavbarItem className="flex">
+            <Link to={urlInstagram} target="_blank">
+              <FaInstagram color="white" size={40} />
+            </Link>
+          </NavbarItem>
         </NavbarItem>
       </NavbarContent>
       <NavbarMenu>
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
-            <Link
-              className="w-full text-black"
-              href="#"
-              size="lg"
+            <button
+              className="w-full text-black text-left py-2 px-4"
+              onClick={() => {
+                setIsMenuOpen(false);
+                switch (item) {
+                  case "Programação":
+                    scrollToSection(refs.programacaoRef);
+                    break;
+                  case "Sobre":
+                    scrollToSection(refs.sobreRef);
+                    break;
+                  case "Galeria":
+                    scrollToSection(refs.galeriaRef);
+                    break;
+                  case "Visão":
+                    scrollToSection(refs.visaoRef);
+                    break;
+                  case "Valores":
+                    scrollToSection(refs.valoresRef);
+                    break;
+                  case "História":
+                    scrollToSection(refs.historiaRef);
+                    break;
+                  case "Contato":
+                    scrollToSection(refs.contatoRef);
+                    break;
+                  default:
+                    break;
+                }
+              }}
             >
               {item}
-            </Link>
+            </button>
           </NavbarMenuItem>
         ))}
       </NavbarMenu>
     </Navbar>
   );
-}
-
+};
