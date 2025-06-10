@@ -15,7 +15,7 @@ export const PaginaPrincipal = () => {
           Endereço
         </Button>
         <Button className="bg-white text-black font-bold w-full md:w-48 lg:w-60">
-          Doaçã
+          Doação
         </Button>
       </div>
     </section>
