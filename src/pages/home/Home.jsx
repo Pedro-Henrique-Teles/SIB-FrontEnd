@@ -42,7 +42,20 @@ function Home() {
         }}
       />
 
-      <PaginaPrincipal />
+      <PaginaPrincipal 
+        irParaOTopo={irParaOTopo}
+        scrollToSection={scrollToSection}
+        refs={{
+          programacaoRef,
+          sobreRef,
+          visaoRef,
+          galeriaRef,
+          valoresRef,
+          historiaRef,
+          formRef,
+          contatoRef,
+        }}
+      />
       <div ref={programacaoRef}>
         <Programacao />
       </div>

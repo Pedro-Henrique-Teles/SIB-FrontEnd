@@ -9,16 +9,13 @@ export const Objetivos = () => {
 <Card
         title="Visão"
         icon={iconeVisao}
-        text="Queremos ser uma igreja centrada na Escritura, composta por uma 
-      liderança biblicamente qualificada e por uma membresia saudável 
-      envolvida na expansão do Reino de Deus."
+        text="Texto Pendente"
         background="GradianteVinho"
       />
       <Card
         title="Missão"
         icon={iconeMissao}
-        text="Existimos para agradar a Deus sendo uma comunidade de discípulos 
-      de Cristo que vive a Escritura e compartilha o Evangelho."
+        text="Texto Pendente"
         background="black"
       />
     </div>

@@ -2,7 +2,7 @@ import { Button, Checkbox, Input } from "@heroui/react";
 
 export const FormularioMembros = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-red-900 text-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-black to-[#571f1f] text-white flex items-center justify-center">
       <div className="w-full max-w-md p-6">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold">EU SOU NOVO</h1>

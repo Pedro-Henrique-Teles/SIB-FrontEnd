@@ -7,7 +7,7 @@ export const Valores = () => {
       title="Valores"
       icon={iconeValores}
       text={
-        "• Liderança Crível – Igreja Expositiva\n• Membresia Saudável – Igreja Missional"
+        "Texto Pendente"
       }
       background="white"
     />
