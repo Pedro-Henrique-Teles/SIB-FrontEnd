@@ -7,10 +7,9 @@ import TabelaMembros from "../pages/admin/TabelaMembros";
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Site público */}
+ 
       <Route path="/" element={<Home />} />
 
-      {/* Área administrativa */}
       <Route path="/admin" element={<Dashboard />}>
         <Route path="tabela" element={<TabelaMembros />} />
       </Route>
