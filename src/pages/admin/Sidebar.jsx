@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 export default function Sidebar() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const location = useLocation();
 
   const menus = [
@@ -35,8 +35,9 @@ export default function Sidebar() {
         open ? "w-64" : "w-20"
       }`}
     >
-      <div>
+      <div onMouseOver={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
         <div
+          
           className={`flex items-center p-4 border-b border-[#552121] ${
             open ? "justify-between" : "justify-center"
           }`}
@@ -44,10 +45,7 @@ export default function Sidebar() {
           <h1 className={`text-lg font-bold ${!open && "hidden"}`}>
             Diretoria Sib-JF
           </h1>
-          <button
-            onClick={() => setOpen(!open)}
-            className="hover:opacity-80 transition"
-          >
+          <button className="hover:opacity-80 transition" >
             <Menu />
           </button>
         </div>
