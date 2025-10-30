@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Menu,
@@ -10,8 +9,8 @@ import {
   Home,
 } from "lucide-react";
 
-export default function Sidebar() {
-  const [open, setOpen] = useState(false);
+// MUDANÇA 1: Aceita 'isMobile' e define o padrão como 'false'
+export default function Sidebar({ open, setOpen, isMobile = false }) {
   const location = useLocation();
 
   const menus = [
@@ -31,26 +30,31 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`bg-[#3f1616] text-white h-screen flex flex-col justify-between transition-all duration-300 ${
+      className={`bg-[#3f1616] text-white min-h-screen flex flex-col justify-between transition-all duration-300 ${
         open ? "w-64" : "w-20"
       }`}
     >
-      <div onMouseOver={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-        <div
-          
-          className={`flex items-center p-4 border-b border-[#552121] ${
-            open ? "justify-between" : "justify-center"
-          }`}
-        >
-          <h1 className={`text-lg font-bold ${!open && "hidden"}`}>
-            Diretoria Sib-JF
-          </h1>
-          <button className="hover:opacity-80 transition" >
-            <Menu />
-          </button>
-        </div>
+      <div>
+        {/* MUDANÇA 2: Este bloco de cabeçalho SÓ aparece se NÃO for mobile */}
+        {!isMobile && (
+          <div
+            className={`flex items-center p-4 border-b border-[#552121] ${
+              open ? "justify-between" : "justify-center"
+            }`}
+          >
+            <h1 className={`text-lg font-bold ${!open && "hidden"}`}>
+              Diretoria Sib-JF
+            </h1>
+            <button
+              className="hover:opacity-80 transition"
+            >
+              <Menu />
+            </button>
+          </div>
+        )}
 
-        <nav className="flex flex-col p-4 gap-2">
+        {/* MUDANÇA 3: Adicionado padding no topo se for mobile (para o conteúdo não colar) */}
+        <nav className={`flex flex-col p-4 gap-2 ${isMobile && "pt-6"}`}>
           {menus.map((menu, i) => (
             <Link
               key={i}

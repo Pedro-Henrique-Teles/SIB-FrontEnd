@@ -254,15 +254,15 @@ export default function TabelaMembros() {
   }, []);
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-md">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-white p-4 md:p-6 rounded-2xl shadow-md">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
         <h2 className="text-2xl font-semibold text-[black]">
           Controle de Membros 2025
         </h2>
         <Button
           variant="solid"
           startContent={<Plus />}
-          className="bg-black text-white hover:bg-gray-800 transition-all"
+          className="bg-black text-white hover:bg-gray-800 transition-all w-full md:w-auto"
         >
           Novo Membro
         </Button>
@@ -285,7 +285,7 @@ export default function TabelaMembros() {
 
       <div className="overflow-x-auto">
         <Table aria-label="Tabela de membros">
-          <TableHeader className="bg-gray-1000 text-white">
+          <TableHeader className="bg-gray-100 text-gray-600 uppercase text-xs">
             <TableColumn>ID</TableColumn>
             <TableColumn>NOME</TableColumn>
             <TableColumn>ANIVERSÁRIO</TableColumn>
