@@ -285,7 +285,7 @@ export default function TabelaMembros() {
 
       <div className="overflow-x-auto">
         <Table aria-label="Tabela de membros">
-          <TableHeader>
+          <TableHeader className="bg-gray-1000 text-white">
             <TableColumn>ID</TableColumn>
             <TableColumn>NOME</TableColumn>
             <TableColumn>ANIVERSÁRIO</TableColumn>
