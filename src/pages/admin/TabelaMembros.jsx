@@ -11,6 +11,8 @@ import {
   Pagination,
 } from "@heroui/react";
 import { Pencil, Trash2, Eye, Plus, Search } from "lucide-react";
+import ModalEditarMembro from "../../components/ModalEditarMembro";
+
 
 const members = [
   {
@@ -207,6 +209,21 @@ export default function TabelaMembros() {
   const [page, setPage] = useState(1);
   const [filterValue, setFilterValue] = useState("");
   const rowsPerPage = 10;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [listaMembros, setListaMembros] = useState(members);
+
+  const handleEditar = (membro) => {
+    setSelectedMember(membro);
+    setIsModalOpen(true);
+  };
+
+  const handleSalvarAlteracoes = (membroAtualizado) => {
+    const novaLista = listaMembros.map((m) =>
+      m.id === membroAtualizado.id ? membroAtualizado : m
+    );
+    setListaMembros(novaLista);
+  };
 
   const filteredMembers = useMemo(() => {
     if (!filterValue) return members;
@@ -325,6 +342,7 @@ export default function TabelaMembros() {
                       isIconOnly
                       variant="solid"
                       className="text-white bg-slate-500 hover:bg-slate-600 transition-colors"
+                      onPress={() => handleEditar(membro)}
                     >
                       <Pencil size={18} />
                     </Button>
@@ -367,6 +385,12 @@ export default function TabelaMembros() {
           />
         )}
       </div>
+      <ModalEditarMembro
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        member={selectedMember}
+        onSave={handleSalvarAlteracoes}
+      />
     </div>
   );
 }
