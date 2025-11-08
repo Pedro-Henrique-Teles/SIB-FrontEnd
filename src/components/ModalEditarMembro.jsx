@@ -32,7 +32,17 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     if (!member) return null;
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} backdrop="blur" size="lg">
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            size="lg"
+            placement="center"
+            backdrop="opaque"
+            classNames={{
+                backdrop: "backdrop-opac-sm"
+            }}
+        >
+
             <ModalContent>
                 <ModalHeader className="text-lg font-semibold">
                     Editar Informações do Membro
@@ -75,9 +85,13 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                     <Button variant="light" onPress={onClose}>
                         Cancelar
                     </Button>
-                    <Button color="primary" onPress={handleSalvar}>
+                    <Button
+                        className="text-white bg-[#411616] hover:bg-[#5b2020] transition-colors"
+                        onPress={handleSalvar}
+                    >
                         Salvar Alterações
                     </Button>
+
                 </ModalFooter>
             </ModalContent>
         </Modal>
