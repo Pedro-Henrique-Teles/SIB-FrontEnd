@@ -12,6 +12,8 @@ import {
 } from "@heroui/react";
 import { Pencil, Trash2, Eye, Plus, Search } from "lucide-react";
 import ModalEditarMembro from "../../components/ModalEditarMembro";
+// NOVO: 1. Importar o novo componente Modal
+import ModalAdicionarMembro from "../../components/ModalAdicionarMembro"; 
 
 
 const members = [
@@ -212,6 +214,8 @@ export default function TabelaMembros() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [listaMembros, setListaMembros] = useState(members);
+  // NOVO: 2. Estado para controlar o modal de adição
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handleEditar = (membro) => {
     setSelectedMember(membro);
@@ -225,12 +229,35 @@ export default function TabelaMembros() {
     setListaMembros(novaLista);
   };
 
+  // NOVO: 3. Função para adicionar um novo membro
+  const handleAdicionarMembro = (novoMembroData) => {
+    // Lógica para gerar um novo ID (encontra o ID máximo atual + 1, ou começa com 1)
+    const newId = listaMembros.length > 0 ? Math.max(...listaMembros.map(m => m.id)) + 1 : 1;
+    
+    // Cria o novo objeto membro, adicionando o ID e valores padrão para campos ausentes no modal
+    const novoMembro = { 
+        ...novoMembroData, 
+        id: newId, 
+        // Valores padrão para campos que não estão no modal mas são exigidos na lista
+        dataEntrada: novoMembroData.dataEntrada || new Date().toLocaleDateString('pt-BR'), 
+        tipoEntrada: novoMembroData.tipoEntrada || "Batismo",
+        profissao: novoMembroData.profissao || "Não Informado",
+        escolaridade: novoMembroData.escolaridade || "Não Informado",
+        cargo: novoMembroData.cargo || "Membro", 
+    };
+
+    // Adiciona o novo membro à lista de membros
+    setListaMembros(prevList => [...prevList, novoMembro]);
+    // console.log("Novo Membro Adicionado:", novoMembro);
+  };
+
   const filteredMembers = useMemo(() => {
-    if (!filterValue) return members;
+    // O filtro agora usa listaMembros, o estado da lista
+    if (!filterValue) return listaMembros; 
 
     const lowerCaseFilter = filterValue.toLowerCase();
 
-    return members.filter((member) => {
+    return listaMembros.filter((member) => {
       return (
         member.id.toString().includes(lowerCaseFilter) ||
         member.nome.toLowerCase().includes(lowerCaseFilter) ||
@@ -246,7 +273,7 @@ export default function TabelaMembros() {
         member.cargo.toLowerCase().includes(lowerCaseFilter)
       );
     });
-  }, [members, filterValue]);
+  }, [listaMembros, filterValue]); // listaMembros como dependência
 
   const pages = Math.ceil(filteredMembers.length / rowsPerPage);
 
@@ -280,6 +307,8 @@ export default function TabelaMembros() {
           variant="solid"
           startContent={<Plus />}
           className="bg-black text-white hover:bg-gray-800 transition-all w-full md:w-auto"
+          // NOVO: 4. Ação de clique para abrir o modal
+          onPress={() => setIsAddModalOpen(true)}
         >
           Novo Membro
         </Button>
@@ -390,6 +419,12 @@ export default function TabelaMembros() {
         onClose={() => setIsModalOpen(false)}
         member={selectedMember}
         onSave={handleSalvarAlteracoes}
+      />
+      {/* NOVO: 5. Renderizar o novo modal de adição */}
+      <ModalAdicionarMembro
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={handleAdicionarMembro}
       />
     </div>
   );
