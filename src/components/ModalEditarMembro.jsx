@@ -8,24 +8,47 @@ import {
     Input,
     Button,
 } from "@heroui/react";
+import { validateMember } from "../utils/validation";
 
 export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     const [formData, setFormData] = React.useState(member || {});
+    const [errors, setErrors] = React.useState({});
 
-    // Atualiza os dados do formulário quando o membro selecionado mudar
+    // Atualiza os dados do formulário e limpa os erros quando o membro muda
     React.useEffect(() => {
-        setFormData(member || {});
-    }, [member]);
+        if (isOpen) {
+            setFormData(member || {});
+            setErrors({}); // Limpa os erros ao abrir ou trocar de membro
+        }
+    }, [isOpen, member]);
 
-    // Atualiza campo por campo conforme o usuário digita
-    const handleChange = (campo, valor) => {
-        setFormData((anterior) => ({ ...anterior, [campo]: valor }));
+    // Função de validação
+    const validate = () => {
+        const tempErrors = validateMember(formData);
+        setErrors(tempErrors);
+        return Object.keys(tempErrors).length === 0;
     };
 
-    // Ao salvar, envia os dados atualizados e fecha o modal
+    // Atualiza o campo e limpa o erro específico
+    const handleChange = (campo, valor) => {
+        setFormData((anterior) => ({ ...anterior, [campo]: valor }));
+        if (errors[campo]) {
+            setErrors((prevErrors) => {
+                const newErrors = { ...prevErrors };
+                delete newErrors[campo];
+                return newErrors;
+            });
+        }
+    };
+
+    // Ao salvar, primeiro valida os dados
     const handleSalvar = () => {
-        onSave(formData);
-        onClose();
+        if (validate()) {
+            onSave(formData);
+            onClose();
+        } else {
+            console.log("Falha na validação ao editar.");
+        }
     };
 
     // Evita renderizar o modal se nenhum membro estiver selecionado
@@ -53,31 +76,43 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                         label="Nome Completo"
                         value={formData.nome || ""}
                         onValueChange={(val) => handleChange("nome", val)}
+                        isInvalid={!!errors.nome}
+                        errorMessage={errors.nome}
                     />
                     <Input
                         label="Data de Nascimento"
                         value={formData.dataAniversario || ""}
                         onValueChange={(val) => handleChange("dataAniversario", val)}
+                        isInvalid={!!errors.dataAniversario}
+                        errorMessage={errors.dataAniversario}
                     />
                     <Input
                         label="E-mail"
                         value={formData.email || ""}
                         onValueChange={(val) => handleChange("email", val)}
+                        isInvalid={!!errors.email}
+                        errorMessage={errors.email}
                     />
                     <Input
                         label="Telefone"
                         value={formData.telefone || ""}
                         onValueChange={(val) => handleChange("telefone", val)}
+                        isInvalid={!!errors.telefone}
+                        errorMessage={errors.telefone}
                     />
                     <Input
                         label="CPF"
                         value={formData.cpf || ""}
                         onValueChange={(val) => handleChange("cpf", val)}
+                        isInvalid={!!errors.cpf}
+                        errorMessage={errors.cpf}
                     />
                     <Input
                         label="Endereço"
                         value={formData.endereco || ""}
                         onValueChange={(val) => handleChange("endereco", val)}
+                        isInvalid={!!errors.endereco}
+                        errorMessage={errors.endereco}
                     />
                 </ModalBody>
 

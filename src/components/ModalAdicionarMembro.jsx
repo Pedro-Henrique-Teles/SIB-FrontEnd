@@ -8,6 +8,7 @@ import {
     Input,
     Button,
 } from "@heroui/react";
+import { validateMember } from "../utils/validation";
 
 // Estado inicial do formulário para um novo membro
 const initialFormData = {
@@ -29,45 +30,7 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
 
     // 2. Função de validação
     const validate = () => {
-        const tempErrors = {};
-        
-        if (!formData.nome) {
-            tempErrors.nome = "O nome é obrigatório.";
-        }
-
-        // Validação da Data de Aniversário
-        if (!formData.dataAniversario) {
-            tempErrors.dataAniversario = "A data de aniversário é obrigatória.";
-        }
-        // Você pode adicionar regex para formato de data se desejar
-        
-        if (!formData.email) {
-            tempErrors.email = "O e-mail é obrigatório.";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            tempErrors.email = "O formato do e-mail é inválido.";
-        }
-
-        if (!formData.telefone) {
-            tempErrors.telefone = "O telefone é obrigatório.";
-        } else {
-            // 1. Limpa o telefone (remove '(', ')', ' ', '-') usando um regex
-            const telefoneLimpo = formData.telefone.replace(/[()\s-]/g, "");
-            if (!/^\d{10,11}$/.test(telefoneLimpo)) {
-                tempErrors.telefone = "O telefone deve ter 10 ou 11 dígitos (com DDD).";
-            }
-        }
-
-        if (!formData.cpf) {
-            tempErrors.cpf = "O CPF é obrigatório.";
-        } else if (!/^\d{11}$/.test(formData.cpf.replace(/[.-]/g, ""))) {
-            // Verifica se tem 11 dígitos (após remover pontos/traços)
-            tempErrors.cpf = "O CPF deve conter 11 dígitos.";
-        }
-
-        if (!formData.endereco) {
-            tempErrors.endereco = "O endereço é obrigatório.";
-        }
-
+        const tempErrors = validateMember(formData);
         setErrors(tempErrors);
         // Retorna true se não houver erros (objeto de erros está vazio)
         return Object.keys(tempErrors).length === 0;
