@@ -13,6 +13,7 @@ import { validateMember } from "../utils/validation";
 export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     const [formData, setFormData] = React.useState(member || {});
     const [errors, setErrors] = React.useState({});
+    const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
 
     // Atualiza os dados do formulário e limpa os erros quando o membro muda
     React.useEffect(() => {
@@ -44,17 +45,24 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     // Ao salvar, primeiro valida os dados
     const handleSalvar = () => {
         if (validate()) {
-            onSave(formData);
-            onClose();
+            setIsConfirmOpen(true);
         } else {
             console.log("Falha na validação ao editar.");
         }
     };
 
+    const handleConfirmarEdicao = () => {
+        onSave(formData);
+        setIsConfirmOpen(false);
+        onClose();
+    };
+    const handleCancelarEdicao = () => setIsConfirmOpen(false);
+
     // Evita renderizar o modal se nenhum membro estiver selecionado
     if (!member) return null;
 
     return (
+        <>
         <Modal
             isOpen={isOpen}
             onClose={onClose}
@@ -130,5 +138,37 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                 </ModalFooter>
             </ModalContent>
         </Modal>
+
+        {/* Modal de confirmação de edição */}
+        <Modal
+            isOpen={isConfirmOpen}
+            onClose={handleCancelarEdicao}
+            placement="center"
+            backdrop="opaque"
+            classNames={{ backdrop: "backdrop-opac-sm" }}
+        >
+            <ModalContent>
+                <ModalHeader className="text-lg font-semibold">
+                    Confirmar alterações
+                </ModalHeader>
+                <ModalBody>
+                    <p>Deseja confirmar as alterações deste membro?</p>
+                    <div className="text-sm text-gray-600 space-y-1">
+                        <p><strong>Nome:</strong> {formData.nome || "—"}</p>
+                        <p><strong>E-mail:</strong> {formData.email || "—"}</p>
+                        <p><strong>Telefone:</strong> {formData.telefone || "—"}</p>
+                    </div>
+                </ModalBody>
+                <ModalFooter>
+                    <Button variant="light" onPress={handleCancelarEdicao}>
+                        Voltar
+                    </Button>
+                    <Button className="text-white bg-[#411616] hover:bg-[#5b2020] transition-colors" onPress={handleConfirmarEdicao}>
+                        Confirmar
+                    </Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+        </>
     );
 }
