@@ -141,6 +141,10 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
                         label="CPF"
                         value={formData.cpf || ""}
                         onValueChange={handleChangeCPF}
+                        onChange={(e) => handleChangeCPF(e.target.value)}
+                        inputMode="numeric"
+                        pattern="\d*"
+                        maxLength={14}
                         isInvalid={!!errors.cpf}
                         errorMessage={errors.cpf}
                     />

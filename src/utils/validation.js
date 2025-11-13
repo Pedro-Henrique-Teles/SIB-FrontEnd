@@ -15,6 +15,33 @@ export function isValidDateBR(dateStr) {
     return day <= daysInMonth[month - 1];
 }
 
+// Valida CPF com dígitos verificadores
+export function isValidCPF(cpf) {
+    if (!cpf) return false;
+    const clean = String(cpf).replace(/\D/g, "");
+    if (clean.length !== 11) return false;
+    // Rejeita sequências do mesmo dígito (ex.: 00000000000, 11111111111)
+    if (/^(\d)\1{10}$/.test(clean)) return false;
+
+    // Primeiro dígito verificador
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+        sum += parseInt(clean[i], 10) * (10 - i);
+    }
+    let remainder = sum % 11;
+    const dv1 = remainder < 2 ? 0 : 11 - remainder;
+    if (parseInt(clean[9], 10) !== dv1) return false;
+
+    // Segundo dígito verificador
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+        sum += parseInt(clean[i], 10) * (11 - i);
+    }
+    remainder = sum % 11;
+    const dv2 = remainder < 2 ? 0 : 11 - remainder;
+    return parseInt(clean[10], 10) === dv2;
+}
+
 export const validateMember = (formData) => {
     const tempErrors = {};
     
@@ -47,8 +74,13 @@ export const validateMember = (formData) => {
 
     if (!formData.cpf) {
         tempErrors.cpf = "O CPF é obrigatório.";
-    } else if (!/^\d{11}$/.test((formData.cpf || "").replace(/[.-]/g, ""))) {
-        tempErrors.cpf = "O CPF deve conter 11 dígitos.";
+    } else {
+        const cpfDigits = (formData.cpf || "").replace(/\D/g, "");
+        if (!/^\d{11}$/.test(cpfDigits)) {
+            tempErrors.cpf = "O CPF deve conter 11 dígitos.";
+        } else if (!isValidCPF(formData.cpf)) {
+            tempErrors.cpf = "CPF inválido.";
+        }
     }
 
     if (!formData.endereco) {

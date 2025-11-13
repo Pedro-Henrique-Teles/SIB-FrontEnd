@@ -21,7 +21,14 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     // Atualiza os dados do formulário e limpa os erros quando o membro muda
     React.useEffect(() => {
         if (isOpen) {
-            setFormData(member || {});
+            // Garante que os campos sejam exibidos mascarados ao abrir
+            const m = member || {};
+            setFormData({
+                ...m,
+                dataAniversario: m.dataAniversario ? formatDateBR(String(m.dataAniversario)) : "",
+                telefone: m.telefone ? formatPhoneBR(String(m.telefone)) : "",
+                cpf: m.cpf ? formatCPFBR(String(m.cpf)) : "",
+            });
             setErrors({}); // Limpa os erros ao abrir ou trocar de membro
         }
     }, [isOpen, member]);
@@ -132,6 +139,10 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                         label="CPF"
                         value={formData.cpf || ""}
                         onValueChange={handleChangeCPF}
+                        onChange={(e) => handleChangeCPF(e.target.value)}
+                        inputMode="numeric"
+                        pattern="\d*"
+                        maxLength={14}
                         isInvalid={!!errors.cpf}
                         errorMessage={errors.cpf}
                     />
