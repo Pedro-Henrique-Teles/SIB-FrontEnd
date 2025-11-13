@@ -10,6 +10,7 @@ import {
 } from "@heroui/react";
 import { validateMember } from "../utils/validation";
 import { useToast } from "./ui/ToastProvider";
+import { formatDateBR } from "../utils/formatters";
 
 // Estado inicial do formulário para um novo membro
 const initialFormData = {
@@ -60,6 +61,12 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
         }    
     };
 
+    // Formata automaticamente a data no formato dd/mm/aaaa
+    const handleChangeData = (valor) => {
+        const masked = formatDateBR(valor);
+        handleChange("dataAniversario", masked);
+    };
+
     // Ao salvar, primeiro valida
     const handleSalvar = () => {
         if (validate()) {
@@ -102,7 +109,7 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
                     <Input
                         label="Data de Aniversário"
                         value={formData.dataAniversario || ""}
-                        onValueChange={(val) => handleChange("dataAniversario", val)}
+                        onValueChange={handleChangeData}
                         isInvalid={!!errors.dataAniversario}
                         errorMessage={errors.dataAniversario}
                     />

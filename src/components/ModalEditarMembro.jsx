@@ -10,6 +10,7 @@ import {
 } from "@heroui/react";
 import { validateMember } from "../utils/validation";
 import { useToast } from "./ui/ToastProvider";
+import { formatDateBR } from "../utils/formatters";
 
 export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     const [formData, setFormData] = React.useState(member || {});
@@ -42,6 +43,12 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                 return newErrors;
             });
         }
+    };
+
+    // Formata automaticamente a data no formato dd/mm/aaaa
+    const handleChangeData = (valor) => {
+        const masked = formatDateBR(valor);
+        handleChange("dataAniversario", masked);
     };
 
     // Ao salvar, primeiro valida os dados
@@ -93,7 +100,7 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                     <Input
                         label="Data de Nascimento"
                         value={formData.dataAniversario || ""}
-                        onValueChange={(val) => handleChange("dataAniversario", val)}
+                        onValueChange={handleChangeData}
                         isInvalid={!!errors.dataAniversario}
                         errorMessage={errors.dataAniversario}
                     />
