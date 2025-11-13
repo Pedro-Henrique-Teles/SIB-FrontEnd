@@ -9,11 +9,13 @@ import {
     Button,
 } from "@heroui/react";
 import { validateMember } from "../utils/validation";
+import { useToast } from "./ui/ToastProvider";
 
 export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     const [formData, setFormData] = React.useState(member || {});
     const [errors, setErrors] = React.useState({});
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+    const { showToast } = useToast();
 
     // Atualiza os dados do formulário e limpa os erros quando o membro muda
     React.useEffect(() => {
@@ -55,6 +57,7 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
         onSave(formData);
         setIsConfirmOpen(false);
         onClose();
+        showToast("Alterações salvas com sucesso!", "success");
     };
     const handleCancelarEdicao = () => setIsConfirmOpen(false);
 

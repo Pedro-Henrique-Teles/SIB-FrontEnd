@@ -2,13 +2,16 @@
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import AppRoutes from "./routes/Routes";
+import { ToastProvider } from "./components/ui/ToastProvider";
 
 
 function App() {
   return (
-    <Router>
-        <AppRoutes />
-    </Router>
+    <ToastProvider>
+      <Router>
+          <AppRoutes />
+      </Router>
+    </ToastProvider>
   );
 }
 

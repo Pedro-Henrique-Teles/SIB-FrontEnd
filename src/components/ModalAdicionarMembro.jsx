@@ -9,6 +9,7 @@ import {
     Button,
 } from "@heroui/react";
 import { validateMember } from "../utils/validation";
+import { useToast } from "./ui/ToastProvider";
 
 // Estado inicial do formulário para um novo membro
 const initialFormData = {
@@ -27,6 +28,7 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
     // Começa com o estado inicial vazio
     const [formData, setFormData] = React.useState(initialFormData);
     const [errors, setErrors] = React.useState({});
+    const { showToast } = useToast();
 
     // 2. Função de validação
     const validate = () => {
@@ -62,6 +64,7 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
     const handleSalvar = () => {
         if (validate()) {
             onSave(formData);
+            showToast("Membro adicionado com sucesso!", "success");
             // O useEffect já vai limpar o form ao fechar/abrir
             onClose(); 
         } else {
