@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import { validateMember } from "../utils/validation";
 import { useToast } from "./ui/ToastProvider";
-import { formatDateBR } from "../utils/formatters";
+import { formatDateBR, formatPhoneBR, formatCPFBR } from "../utils/formatters";
 
 export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     const [formData, setFormData] = React.useState(member || {});
@@ -49,6 +49,16 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     const handleChangeData = (valor) => {
         const masked = formatDateBR(valor);
         handleChange("dataAniversario", masked);
+    };
+
+    const handleChangeTelefone = (valor) => {
+        const masked = formatPhoneBR(valor);
+        handleChange("telefone", masked);
+    };
+
+    const handleChangeCPF = (valor) => {
+        const masked = formatCPFBR(valor);
+        handleChange("cpf", masked);
     };
 
     // Ao salvar, primeiro valida os dados
@@ -114,14 +124,14 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                     <Input
                         label="Telefone"
                         value={formData.telefone || ""}
-                        onValueChange={(val) => handleChange("telefone", val)}
+                        onValueChange={handleChangeTelefone}
                         isInvalid={!!errors.telefone}
                         errorMessage={errors.telefone}
                     />
                     <Input
                         label="CPF"
                         value={formData.cpf || ""}
-                        onValueChange={(val) => handleChange("cpf", val)}
+                        onValueChange={handleChangeCPF}
                         isInvalid={!!errors.cpf}
                         errorMessage={errors.cpf}
                     />

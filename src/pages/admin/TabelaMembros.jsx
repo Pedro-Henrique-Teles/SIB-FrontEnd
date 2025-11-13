@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useDeferredValue } from "react";
 import {
   Table,
   TableHeader,
@@ -251,11 +251,13 @@ export default function TabelaMembros() {
     // console.log("Novo Membro Adicionado:", novoMembro);
   };
 
+  const deferredFilter = useDeferredValue(filterValue);
+
   const filteredMembers = useMemo(() => {
     // O filtro agora usa listaMembros, o estado da lista
-    if (!filterValue) return listaMembros; 
+    if (!deferredFilter) return listaMembros; 
 
-    const lowerCaseFilter = filterValue.toLowerCase();
+    const lowerCaseFilter = deferredFilter.toLowerCase();
 
     return listaMembros.filter((member) => {
       return (
@@ -273,7 +275,7 @@ export default function TabelaMembros() {
         member.cargo.toLowerCase().includes(lowerCaseFilter)
       );
     });
-  }, [listaMembros, filterValue]); // listaMembros como dependência
+  }, [listaMembros, deferredFilter]); // usa valor adiado para reduzir lag
 
   const pages = Math.ceil(filteredMembers.length / rowsPerPage);
 
@@ -371,6 +373,7 @@ export default function TabelaMembros() {
                       isIconOnly
                       variant="solid"
                       className="text-white bg-slate-500 hover:bg-slate-600 transition-colors"
+                      aria-label="Editar membro"
                       onPress={() => handleEditar(membro)}
                     >
                       <Pencil size={18} />
@@ -379,6 +382,7 @@ export default function TabelaMembros() {
                       isIconOnly
                       variant="solid"
                       className="text-white bg-red-400 hover:bg-red-500 transition-colors"
+                      aria-label="Excluir membro"
                     >
                       <Trash2 size={18} />
                     </Button>
@@ -386,6 +390,7 @@ export default function TabelaMembros() {
                       isIconOnly
                       variant="solid"
                       className="text-white bg-gray-500 hover:bg-gray-600 transition-colors"
+                      aria-label="Visualizar membro"
                     >
                       <Eye size={18} />
                     </Button>
