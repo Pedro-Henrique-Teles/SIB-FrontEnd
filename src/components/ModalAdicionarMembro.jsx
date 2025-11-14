@@ -8,6 +8,9 @@ import {
     Input,
     Button,
 } from "@heroui/react";
+import { validateMember } from "../utils/validation";
+import { useToast } from "./ui/ToastProvider";
+import { formatDateBR, formatPhoneBR, formatCPFBR } from "../utils/formatters";
 
 // Estado inicial do formulário para um novo membro
 const initialFormData = {
@@ -25,27 +28,67 @@ const initialFormData = {
 export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
     // Começa com o estado inicial vazio
     const [formData, setFormData] = React.useState(initialFormData);
+    const [errors, setErrors] = React.useState({});
+    const { showToast } = useToast();
 
-    // Limpa o formulário quando o modal é aberto ou fechado
-    // Este useEffect é importante para resetar o form ao fechar.
+    // 2. Função de validação
+    const validate = () => {
+        const tempErrors = validateMember(formData);
+        setErrors(tempErrors);
+        // Retorna true se não houver erros (objeto de erros está vazio)
+        return Object.keys(tempErrors).length === 0;
+    };
+
+    // Limpa o formulário E OS ERROS quando o modal é aberto
     React.useEffect(() => {
         if (isOpen) {
             setFormData(initialFormData);
+            setErrors({}); // Limpa os erros ao abrir
         }
     }, [isOpen]);
 
-    // Atualiza campo por campo conforme o usuário digita
+    // Atualiza o estado e limpa o erro do campo específico ao digitar
     const handleChange = (campo, valor) => {
         setFormData((anterior) => ({ ...anterior, [campo]: valor }));
+        
+        // Limpa o erro do campo que está sendo editado
+        if (errors[campo]) {
+            setErrors((prevErrors) => {
+                const newErrors = { ...prevErrors };
+                delete newErrors[campo]; // Remove a chave do erro
+                return newErrors;
+            });
+        }    
     };
 
-    // Ao salvar, envia os dados e fecha o modal
+    // Formata automaticamente a data no formato dd/mm/aaaa
+    const handleChangeData = (valor) => {
+        const masked = formatDateBR(valor);
+        handleChange("dataAniversario", masked);
+    };
+
+    const handleChangeTelefone = (valor) => {
+        const masked = formatPhoneBR(valor);
+        handleChange("telefone", masked);
+    };
+
+    const handleChangeCPF = (valor) => {
+        const masked = formatCPFBR(valor);
+        handleChange("cpf", masked);
+    };
+
+    // Ao salvar, primeiro valida
     const handleSalvar = () => {
-        // Você pode querer adicionar validação aqui antes de salvar
-        onSave(formData);
-        // Reseta o estado local do formulário após salvar e fechar
-        setFormData(initialFormData); 
-        onClose();
+        if (validate()) {
+            onSave(formData);
+            showToast("Membro adicionado com sucesso!", "success");
+            // O useEffect já vai limpar o form ao fechar/abrir
+            onClose(); 
+        } else {
+            // Se não passar, a função validate() já atualizou o estado 'errors',
+            // e os inputs exibirão as mensagens automaticamente.
+            console.log("Falha na validação.");
+        }
     };
 
     return (
@@ -70,31 +113,47 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
                         label="Nome Completo"
                         value={formData.nome || ""}
                         onValueChange={(val) => handleChange("nome", val)}
+                        isInvalid={!!errors.nome}
+                        errorMessage={errors.nome}
                     />
                     <Input
                         label="Data de Aniversário"
                         value={formData.dataAniversario || ""}
-                        onValueChange={(val) => handleChange("dataAniversario", val)}
+                        onValueChange={handleChangeData}
+                        isInvalid={!!errors.dataAniversario}
+                        errorMessage={errors.dataAniversario}
                     />
                     <Input
                         label="E-mail"
                         value={formData.email || ""}
                         onValueChange={(val) => handleChange("email", val)}
+                        isInvalid={!!errors.email}
+                        errorMessage={errors.email}
                     />
                     <Input
                         label="Telefone"
                         value={formData.telefone || ""}
-                        onValueChange={(val) => handleChange("telefone", val)}
+                        onValueChange={handleChangeTelefone}
+                        isInvalid={!!errors.telefone}
+                        errorMessage={errors.telefone}
                     />
                     <Input
                         label="CPF"
                         value={formData.cpf || ""}
-                        onValueChange={(val) => handleChange("cpf", val)}
+                        onValueChange={handleChangeCPF}
+                        onChange={(e) => handleChangeCPF(e.target.value)}
+                        inputMode="numeric"
+                        pattern="\d*"
+                        maxLength={14}
+                        isInvalid={!!errors.cpf}
+                        errorMessage={errors.cpf}
                     />
                     <Input
                         label="Endereço"
                         value={formData.endereco || ""}
                         onValueChange={(val) => handleChange("endereco", val)}
+                        isInvalid={!!errors.endereco}
+                        errorMessage={errors.endereco}
                     />
                     {/* Inclua outros Inputs conforme necessário */}
                 </ModalBody>
