@@ -9,19 +9,15 @@ import {
     Button,
 } from "@heroui/react";
 import { validateMember } from "../utils/validation";
-import { useToast } from "./ui/ToastProvider";
 import { formatDateBR, formatPhoneBR, formatCPFBR } from "../utils/formatters";
 
 export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
     const [formData, setFormData] = React.useState(member || {});
     const [errors, setErrors] = React.useState({});
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
-    const { showToast } = useToast();
-
-    // Atualiza os dados do formulário e limpa os erros quando o membro muda
+    
     React.useEffect(() => {
         if (isOpen) {
-            // Garante que os campos sejam exibidos mascarados ao abrir
             const m = member || {};
             setFormData({
                 ...m,
@@ -29,18 +25,16 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                 telefone: m.telefone ? formatPhoneBR(String(m.telefone)) : "",
                 cpf: m.cpf ? formatCPFBR(String(m.cpf)) : "",
             });
-            setErrors({}); // Limpa os erros ao abrir ou trocar de membro
+            setErrors({}); 
         }
     }, [isOpen, member]);
 
-    // Função de validação
     const validate = () => {
-        const tempErrors = validateMember(formData);
+        const tempErrors = validateMember(formData, true); // 'true' para isEdit
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
 
-    // Atualiza o campo e limpa o erro específico
     const handleChange = (campo, valor) => {
         setFormData((anterior) => ({ ...anterior, [campo]: valor }));
         if (errors[campo]) {
@@ -52,23 +46,20 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
         }
     };
 
-    // Formata automaticamente a data no formato dd/mm/aaaa
+    // Funções de máscara
     const handleChangeData = (valor) => {
         const masked = formatDateBR(valor);
         handleChange("dataAniversario", masked);
     };
-
     const handleChangeTelefone = (valor) => {
         const masked = formatPhoneBR(valor);
         handleChange("telefone", masked);
     };
-
     const handleChangeCPF = (valor) => {
         const masked = formatCPFBR(valor);
         handleChange("cpf", masked);
     };
 
-    // Ao salvar, primeiro valida os dados
     const handleSalvar = () => {
         if (validate()) {
             setIsConfirmOpen(true);
@@ -81,11 +72,9 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
         onSave(formData);
         setIsConfirmOpen(false);
         onClose();
-        showToast("Alterações salvas com sucesso!", "success");
     };
     const handleCancelarEdicao = () => setIsConfirmOpen(false);
 
-    // Evita renderizar o modal se nenhum membro estiver selecionado
     if (!member) return null;
 
     return (
@@ -93,14 +82,13 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            size="lg"
+            size="lg" 
             placement="center"
             backdrop="opaque"
             classNames={{
                 backdrop: "backdrop-opac-sm"
             }}
         >
-
             <ModalContent>
                 <ModalHeader className="text-lg font-semibold">
                     Editar Informações do Membro
@@ -139,9 +127,7 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                         label="CPF"
                         value={formData.cpf || ""}
                         onValueChange={handleChangeCPF}
-                        onChange={(e) => handleChangeCPF(e.target.value)}
                         inputMode="numeric"
-                        pattern="\d*"
                         maxLength={14}
                         isInvalid={!!errors.cpf}
                         errorMessage={errors.cpf}
@@ -153,6 +139,19 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                         isInvalid={!!errors.endereco}
                         errorMessage={errors.endereco}
                     />
+                    
+                     <Input
+                        label="Cargo"
+                        placeholder="Ex: Membro, Diácono"
+                        value={formData.cargo || ""}
+                        onValueChange={(val) => handleChange("cargo", val)}
+                        isInvalid={!!errors.cargo}
+                        errorMessage={errors.cargo}
+                        className="md:col-span-2" // Faz o último campo ocupar a linha inteira
+                    />
+                    
+                    {/* Campos de Sexo e Senha REMOVIDOS do formulário */}
+
                 </ModalBody>
 
                 <ModalFooter>
@@ -165,12 +164,11 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                     >
                         Salvar Alterações
                     </Button>
-
                 </ModalFooter>
             </ModalContent>
         </Modal>
 
-        {/* Modal de confirmação de edição */}
+        {/* Modal de confirmação (sem alteração) */}
         <Modal
             isOpen={isConfirmOpen}
             onClose={handleCancelarEdicao}
@@ -184,11 +182,6 @@ export default function ModalEditarMembro({ isOpen, onClose, member, onSave }) {
                 </ModalHeader>
                 <ModalBody>
                     <p>Deseja confirmar as alterações deste membro?</p>
-                    <div className="text-sm text-gray-600 space-y-1">
-                        <p><strong>Nome:</strong> {formData.nome || "—"}</p>
-                        <p><strong>E-mail:</strong> {formData.email || "—"}</p>
-                        <p><strong>Telefone:</strong> {formData.telefone || "—"}</p>
-                    </div>
                 </ModalBody>
                 <ModalFooter>
                     <Button variant="light" onPress={handleCancelarEdicao}>

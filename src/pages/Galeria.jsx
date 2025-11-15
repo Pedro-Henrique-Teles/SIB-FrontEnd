@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
-import galeria1 from "../../public/img/galeria1.jpg";
-import galeria2 from "../../public/img/galeria2.jpg";
-import galeria3 from "../../public/img/galeria3.jpg";
-import galeria4 from "../../public/img/galeria4.jpg";
-import galeria5 from "../../public/img/galeria5.jpg";
-import galeria6 from "../../public/img/galeria6.jpg";
+// REMOVA TODOS OS IMPORTS DE IMAGEM DAQUI
+// import galeria1 from "../../public/img/galeria1.jpg";
+// ...
+// import galeria6 from "../../public/img/galeria6.jpg";
 
 export const Galeria = () => {
-  const fotos = [galeria1, galeria2, galeria3, galeria4, galeria5, galeria6];
+  // CORREÇÃO: Use os caminhos como strings
+  const fotos = [
+    "/img/galeria1.jpg",
+    "/img/galeria2.jpg",
+    "/img/galeria3.jpg",
+    "/img/galeria4.jpg",
+    "/img/galeria5.jpg",
+    "/img/galeria6.jpg",
+  ];
 
   const [imagensVisiveis, setImagensVisiveis] = useState(1);
   const [paginaAtual, setPaginaAtual] = useState(0);
@@ -81,7 +87,7 @@ export const Galeria = () => {
             {fotosVisiveis.map((foto, index) => (
               <div key={index} className="flex-shrink-0 w-full md:w-auto">
                 <img
-                  src={foto}
+                  src={foto} // 'foto' agora é uma string (URL)
                   alt={`Foto ${paginaAtual * imagensVisiveis + index + 1}`}
                   className="w-full h-[350px] md:h-[400px] lg:h-[500px] object-cover rounded-lg shadow-lg transition-transform duration-300 hover:scale-105"
                   loading="lazy"

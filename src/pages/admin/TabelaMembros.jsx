@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useDeferredValue } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -9,307 +9,212 @@ import {
   Button,
   Input,
   Pagination,
+  Spinner, 
 } from "@heroui/react";
 import { Pencil, Trash2, Eye, Plus, Search } from "lucide-react";
 import ModalEditarMembro from "../../components/ModalEditarMembro";
-// NOVO: 1. Importar o novo componente Modal
-import ModalAdicionarMembro from "../../components/ModalAdicionarMembro"; 
+import ModalAdicionarMembro from "../../components/ModalAdicionarMembro";
+import { useToast } from "../../components/ui/ToastProvider";
 
+// --- CONFIGURAÇÃO DA API ---
+// CORREÇÃO: Porta atualizada para 3008
+const API_BASE_URL = "http://localhost:3008/api/v1/sibApi/user"; 
 
-const members = [
-  {
-    id: 1,
-    nome: "João Silva Santos",
-    dataAniversario: "15/05/1990",
-    sexo: "Masculino",
-    telefone: "(11) 98765-4321",
-    endereco: "Rua das Flores, 123, São Paulo - SP",
-    cpf: "123.456.789-01",
-    dataEntrada: "10/01/2015",
-    tipoEntrada: "Batismo",
-    profissao: "Contador",
-    escolaridade: "Ensino Superior Completo",
-    cargo: "Tesouraria",
-  },
-  {
-    id: 2,
-    nome: "Maria Oliveira Costa",
-    dataAniversario: "22/11/1992",
-    sexo: "Feminino",
-    telefone: "(21) 91234-5678",
-    endereco: "Avenida Principal, 456, Rio de Janeiro - RJ",
-    cpf: "234.567.890-12",
-    dataEntrada: "05/03/2018",
-    tipoEntrada: "Transferência",
-    profissao: "Designer Gráfica",
-    escolaridade: "Ensino Superior Completo",
-    cargo: "Mídia",
-  },
-  {
-    id: 3,
-    nome: "Carlos Santos Lima",
-    dataAniversario: "01/02/1985",
-    sexo: "Masculino",
-    telefone: "(31) 98888-7777",
-    endereco: "Travessa das Pedras, 789, Belo Horizonte - MG",
-    cpf: "345.678.901-23",
-    dataEntrada: "20/07/2010",
-    tipoEntrada: "Aclamação",
-    profissao: "Engenheiro Civil",
-    escolaridade: "Pós-graduação",
-    cargo: "Patrimônio",
-  },
-  {
-    id: 4,
-    nome: "Ana Costa Pereira",
-    dataAniversario: "30/07/2000",
-    sexo: "Feminino",
-    telefone: "(71) 99999-1111",
-    endereco: "Praça da Matriz, 10, Salvador - BA",
-    cpf: "456.789.012-34",
-    dataEntrada: "15/02/2020",
-    tipoEntrada: "Batismo",
-    profissao: "Estudante",
-    escolaridade: "Ensino Superior Incompleto",
-    cargo: "Sonoplastia",
-  },
-  {
-    id: 5,
-    nome: "Pedro Almeida Ferreira",
-    dataAniversario: "19/09/1988",
-    sexo: "Masculino",
-    telefone: "(41) 98765-1234",
-    endereco: "Alameda dos Anjos, 22, Curitiba - PR",
-    cpf: "567.890.123-45",
-    dataEntrada: "01/12/2012",
-    tipoEntrada: "Transferência",
-    profissao: "Advogado",
-    escolaridade: "Mestrado",
-    cargo: "Diácono",
-  },
-  {
-    id: 6,
-    nome: "Luísa Pereira Souza",
-    dataAniversario: "05/03/1995",
-    sexo: "Feminino",
-    telefone: "(51) 98111-2222",
-    endereco: "Rua da Quitanda, 305, Porto Alegre - RS",
-    cpf: "678.901.234-56",
-    dataEntrada: "10/10/2019",
-    tipoEntrada: "Batismo",
-    profissao: "Enfermeira",
-    escolaridade: "Ensino Superior Completo",
-    cargo: "Líder de Célula",
-  },
-  {
-    id: 7,
-    nome: "Marcos Ribeiro Alves",
-    dataAniversario: "12/08/1993",
-    sexo: "Masculino",
-    telefone: "(81) 99222-3333",
-    endereco: "Rua Sete de Setembro, 707, Recife - PE",
-    cpf: "789.012.345-67",
-    dataEntrada: "03/03/2017",
-    tipoEntrada: "Aclamação",
-    profissao: "Técnico de Som",
-    escolaridade: "Ensino Médio Completo",
-    cargo: "Mídia",
-  },
-  {
-    id: 8,
-    nome: "Fernanda Lima Barros",
-    dataAniversario: "25/12/1998",
-    sexo: "Feminino",
-    telefone: "(81) 99333-4444",
-    endereco: "Avenida Boa Viagem, 800, Recife - PE",
-    cpf: "890.123.456-78",
-    dataEntrada: "08/06/2021",
-    tipoEntrada: "Transferência",
-    profissao: "Arquiteta",
-    escolaridade: "Ensino Superior Completo",
-    cargo: "Diácono",
-  },
-  {
-    id: 9,
-    nome: "Ricardo Gomes Martins",
-    dataAniversario: "03/06/1980",
-    sexo: "Masculino",
-    telefone: "(92) 98444-5555",
-    endereco: "Rua da Moeda, 99, Manaus - AM",
-    cpf: "901.234.567-89",
-    dataEntrada: "19/04/2009",
-    tipoEntrada: "Batismo",
-    profissao: "Bancário",
-    escolaridade: "Pós-graduação",
-    cargo: "Tesouraria",
-  },
-  {
-    id: 10,
-    nome: "Beatriz Nunes Correia",
-    dataAniversario: "14/02/1997",
-    sexo: "Feminino",
-    telefone: "(92) 98555-6666",
-    endereco: "Largo de São Sebastião, 10, Manaus - AM",
-    cpf: "012.345.678-90",
-    dataEntrada: "11/11/2018",
-    tipoEntrada: "Aclamação",
-    profissao: "Professora",
-    escolaridade: "Ensino Superior Completo",
-    cargo: "Patrimônio",
-  },
-  {
-    id: 11,
-    nome: "Lucas Mendes Teixeira",
-    dataAniversario: "29/04/1991",
-    sexo: "Masculino",
-    telefone: "(21) 98666-7777",
-    endereco: "Rua das Laranjeiras, 111, Rio de Janeiro - RJ",
-    cpf: "111.222.333-44",
-    dataEntrada: "14/09/2016",
-    tipoEntrada: "Batismo",
-    profissao: "Músico",
-    escolaridade: "Ensino Médio Completo",
-    cargo: "Sonoplastia",
-  },
-  {
-    id: 12,
-    nome: "Juliana Andrade Pinto",
-    dataAniversario: "07/10/2001",
-    sexo: "Feminino",
-    telefone: "(11) 98777-8888",
-    endereco: "Rua Augusta, 222, São Paulo - SP",
-    cpf: "222.333.444-55",
-    dataEntrada: "30/01/2022",
-    tipoEntrada: "Transferência",
-    profissao: "Jornalista",
-    escolaridade: "Ensino Superior Completo",
-    cargo: "Líder de Célula",
-  },
-];
+// --- FUNÇÕES HELPER DE FORMATAÇÃO E MAPEAMENTO ---
+// (Estas funções ficam AQUI FORA, antes do 'export default function')
 
-const getCargoBadgeStyles = (cargo) => {
-  const baseStyle = "px-3 py-1 rounded-full text-xs font-medium";
-  switch (cargo) {
-    case "Tesouraria":
-      return `${baseStyle} bg-slate-200 text-slate-800`;
-    case "Mídia":
-      return `${baseStyle} bg-zinc-200 text-zinc-800`;
-    case "Patrimônio":
-      return `${baseStyle} bg-stone-200 text-stone-800`;
-    case "Sonoplastia":
-      return `${baseStyle} bg-zinc-200 text-zinc-800`;
-    case "Diácono":
-      return `${baseStyle} bg-gray-200 text-gray-800`;
-    case "Líder de Célula":
-      return `${baseStyle} bg-slate-200 text-slate-800`;
-    default:
-      return `${baseStyle} bg-gray-200 text-gray-800`;
-  }
+const formatApiDateToBR = (dateStr) => {
+  if (!dateStr) return "";
+  const dateOnly = dateStr.split("T")[0]; 
+  const [year, month, day] = dateOnly.split("-");
+  return `${day}/${month}/${year}`;
 };
 
+const formatBRDateToApi = (dateStr) => {
+  if (!dateStr) return "";
+  const [day, month, year] = dateStr.split("/");
+  return `${year}-${month}-${day}`;
+};
+
+const mapApiToFront = (user) => ({
+  id: user.id,
+  nome: user.name,
+  dataAniversario: formatApiDateToBR(user.birthDate), 
+  sexo: user.gender, 
+  telefone: user.phone,
+  endereco: user.address,
+  cpf: user.cpf,
+  email: user.email,
+  cargo: user.role,
+});
+
+const mapFrontToApi = (member) => {
+  const payload = {
+    name: member.nome,
+    email: member.email,
+    cpf: (member.cpf || "").replace(/\D/g, ""), 
+    phone: (member.telefone || "").replace(/\D/g, ""),
+    address: member.endereco,
+    
+    // --- CORREÇÃO DO ERRO DE EDIÇÃO ---
+    // A API espera 'birthDate' com "D" maiúsculo
+    birthDate: formatBRDateToApi(member.dataAniversario),
+    // --- FIM DA CORREÇÃO ---
+    
+    role: member.cargo,
+  };
+  
+  return payload;
+};
+
+// --- COMPONENTE PRINCIPAL ---
+// (O componente começa AQUI)
 export default function TabelaMembros() {
   const [page, setPage] = useState(1);
   const [filterValue, setFilterValue] = useState("");
   const rowsPerPage = 10;
+  
+  const [listaMembros, setListaMembros] = useState([]); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
-  const [listaMembros, setListaMembros] = useState(members);
-  // NOVO: 2. Estado para controlar o modal de adição
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  
+  const { showToast } = useToast();
 
+  const fetchMembros = useCallback(async (filtro = "") => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      let url = API_BASE_URL; 
+      if (filtro) {
+        url = `${API_BASE_URL}/search?name=${filtro}`;
+      }
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText || "Erro ao buscar dados"}`);
+      }
+      const data = await response.json();
+      setListaMembros(data.map(mapApiToFront)); 
+      
+    } catch (err) {
+      setError(err.message);
+      showToast(`Erro ao buscar membros: ${err.message}`, "error");
+      setListaMembros([]); 
+    } finally {
+      setIsLoading(false);
+    }
+  }, [showToast]); 
+
+  useEffect(() => {
+    fetchMembros();
+  }, [fetchMembros]);
+
+  const getApiErrorMessage = (errorData) => {
+    if (Array.isArray(errorData.message)) {
+      return errorData.message[0]; 
+    }
+    return errorData.message || "Erro desconhecido";
+  };
+
+  // CREATE (POST)
+  const handleAdicionarMembro = async (novoMembroData) => {
+    try {
+      const membroParaApi = mapFrontToApi(novoMembroData);
+      
+      membroParaApi.gender = 'M'; 
+      membroParaApi.password = 'Membro12345'; 
+
+      const response = await fetch(`${API_BASE_URL}/create`, { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(membroParaApi),
+      }); 
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: `HTTP ${response.status}` }));
+        throw new Error(getApiErrorMessage(errorData));
+      }
+
+      showToast("Membro adicionado com sucesso!", "success");
+      setIsAddModalOpen(false);
+      fetchMembros(); 
+    } catch (err) {
+      setError(err.message);
+      showToast(`Erro ao adicionar membro: ${err.message}`, "error");
+    }
+  };
+
+  // UPDATE (PATCH)
+  const handleSalvarAlteracoes = async (membroAtualizado) => {
+    try {
+      const membroParaApi = mapFrontToApi(membroAtualizado); 
+      membroParaApi.gender = membroAtualizado.sexo; 
+      
+      const response = await fetch(`${API_BASE_URL}/edit/${membroAtualizado.id}`, { 
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(membroParaApi),
+      }); 
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: `HTTP ${response.status}` }));
+        throw new Error(getApiErrorMessage(errorData));
+      }
+      
+      showToast("Alterações salvas com sucesso!", "success");
+      setIsModalOpen(false);
+      fetchMembros(); 
+    } catch (err) {
+      setError(err.message);
+      showToast(`Erro ao salvar alterações: ${err.message}`, "error");
+    }
+  };
+
+  // --- LIXEIRA (Estado "antes de implementar") ---
+  const handleDeletar = async (id) => {
+    alert("Função de Deletar ainda não implementada no back-end (API).");
+  };
+  // --- FIM DA LIXEIRA ---
+  
   const handleEditar = (membro) => {
     setSelectedMember(membro);
     setIsModalOpen(true);
   };
 
-  const handleSalvarAlteracoes = (membroAtualizado) => {
-    const novaLista = listaMembros.map((m) =>
-      m.id === membroAtualizado.id ? membroAtualizado : m
-    );
-    setListaMembros(novaLista);
-  };
-
-  // NOVO: 3. Função para adicionar um novo membro
-  const handleAdicionarMembro = (novoMembroData) => {
-    // Lógica para gerar um novo ID (encontra o ID máximo atual + 1, ou começa com 1)
-    const newId = listaMembros.length > 0 ? Math.max(...listaMembros.map(m => m.id)) + 1 : 1;
-    
-    // Cria o novo objeto membro, adicionando o ID e valores padrão para campos ausentes no modal
-    const novoMembro = { 
-        ...novoMembroData, 
-        id: newId, 
-        // Valores padrão para campos que não estão no modal mas são exigidos na lista
-        dataEntrada: novoMembroData.dataEntrada || new Date().toLocaleDateString('pt-BR'), 
-        tipoEntrada: novoMembroData.tipoEntrada || "Batismo",
-        profissao: novoMembroData.profissao || "Não Informado",
-        escolaridade: novoMembroData.escolaridade || "Não Informado",
-        cargo: novoMembroData.cargo || "Membro", 
-    };
-
-    // Adiciona o novo membro à lista de membros
-    setListaMembros(prevList => [...prevList, novoMembro]);
-    // console.log("Novo Membro Adicionado:", novoMembro);
-  };
-
-  const deferredFilter = useDeferredValue(filterValue);
-
-  const filteredMembers = useMemo(() => {
-    // O filtro agora usa listaMembros, o estado da lista
-    if (!deferredFilter) return listaMembros; 
-
-    const lowerCaseFilter = deferredFilter.toLowerCase();
-
-    return listaMembros.filter((member) => {
-      return (
-        member.id.toString().includes(lowerCaseFilter) ||
-        member.nome.toLowerCase().includes(lowerCaseFilter) ||
-        member.dataAniversario.toLowerCase().includes(lowerCaseFilter) ||
-        member.sexo.toLowerCase().includes(lowerCaseFilter) ||
-        member.telefone.toLowerCase().includes(lowerCaseFilter) ||
-        member.endereco.toLowerCase().includes(lowerCaseFilter) ||
-        member.cpf.toLowerCase().includes(lowerCaseFilter) ||
-        member.dataEntrada.toLowerCase().includes(lowerCaseFilter) ||
-        member.tipoEntrada.toLowerCase().includes(lowerCaseFilter) ||
-        member.profissao.toLowerCase().includes(lowerCaseFilter) ||
-        member.escolaridade.toLowerCase().includes(lowerCaseFilter) ||
-        member.cargo.toLowerCase().includes(lowerCaseFilter)
-      );
-    });
-  }, [listaMembros, deferredFilter]); // usa valor adiado para reduzir lag
-
-  const pages = Math.ceil(filteredMembers.length / rowsPerPage);
-
-  const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    return filteredMembers.slice(start, end);
-  }, [page, filteredMembers]);
-
   const onSearchChange = useCallback((value) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
+    setFilterValue(value);
+    setPage(1); 
+    fetchMembros(value); 
+  }, [fetchMembros]); 
 
   const onClear = useCallback(() => {
     setFilterValue("");
     setPage(1);
-  }, []);
+    fetchMembros(); 
+  }, [fetchMembros]);
+
+  const pages = Math.ceil(listaMembros.length / rowsPerPage);
+
+  const paginatedMembers = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return listaMembros.slice(start, end); 
+  }, [page, listaMembros]);
 
   return (
     <div className="bg-white p-4 md:p-6 rounded-2xl shadow-md">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
         <h2 className="text-2xl font-semibold text-[black]">
-          Controle de Membros 2025
+          Controle de Membros
         </h2>
         <Button
           variant="solid"
           startContent={<Plus />}
           className="bg-black text-white hover:bg-gray-800 transition-all w-full md:w-auto"
-          // NOVO: 4. Ação de clique para abrir o modal
           onPress={() => setIsAddModalOpen(true)}
         >
           Novo Membro
@@ -319,7 +224,7 @@ export default function TabelaMembros() {
       <div className="mb-4">
         <Input
           isClearable
-          placeholder="Pesquisar em qualquer campo..."
+          placeholder="Pesquisar por nome..."
           startContent={<Search size={18} className="text-gray-400" />}
           value={filterValue}
           onValueChange={onSearchChange}
@@ -332,78 +237,79 @@ export default function TabelaMembros() {
       </div>
 
       <div className="overflow-x-auto">
-        <Table aria-label="Tabela de membros">
-          <TableHeader className="bg-gray-100 text-gray-600 uppercase text-xs">
-            <TableColumn>ID</TableColumn>
-            <TableColumn>NOME</TableColumn>
-            <TableColumn>ANIVERSÁRIO</TableColumn>
-            <TableColumn>SEXO</TableColumn>
-            <TableColumn>TELEFONE</TableColumn>
-            <TableColumn>ENDEREÇO</TableColumn>
-            <TableColumn>CPF</TableColumn>
-            <TableColumn>ENTRADA</TableColumn>
-            <TableColumn>ORIGEM</TableColumn>
-            <TableColumn>PROFISSÃO</TableColumn>
-            <TableColumn>ESCOLARIDADE</TableColumn>
-            <TableColumn>CARGO</TableColumn>
-            <TableColumn>AÇÕES</TableColumn>
-          </TableHeader>
-          <TableBody>
-            {items.map((membro) => (
-              <TableRow key={membro.id}>
-                <TableCell>{membro.id}</TableCell>
-                <TableCell>{membro.nome}</TableCell>
-                <TableCell>{membro.dataAniversario}</TableCell>
-                <TableCell>{membro.sexo}</TableCell>
-                <TableCell>{membro.telefone}</TableCell>
-                <TableCell>{membro.endereco}</TableCell>
-                <TableCell>{membro.cpf}</TableCell>
-                <TableCell>{membro.dataEntrada}</TableCell>
-                <TableCell>{membro.tipoEntrada}</TableCell>
-                <TableCell>{membro.profissao}</TableCell>
-                <TableCell>{membro.escolaridade}</TableCell>
-                <TableCell>
-                  <span className={getCargoBadgeStyles(membro.cargo)}>
-                    {membro.cargo}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      isIconOnly
-                      variant="solid"
-                      className="text-white bg-slate-500 hover:bg-slate-600 transition-colors"
-                      aria-label="Editar membro"
-                      onPress={() => handleEditar(membro)}
-                    >
-                      <Pencil size={18} />
-                    </Button>
-                    <Button
-                      isIconOnly
-                      variant="solid"
-                      className="text-white bg-red-400 hover:bg-red-500 transition-colors"
-                      aria-label="Excluir membro"
-                    >
-                      <Trash2 size={18} />
-                    </Button>
-                    <Button
-                      isIconOnly
-                      variant="solid"
-                      className="text-white bg-gray-500 hover:bg-gray-600 transition-colors"
-                      aria-label="Visualizar membro"
-                    >
-                      <Eye size={18} />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {isLoading && (
+          <div className="flex justify-center items-center h-64">
+            <Spinner size="lg" />
+          </div>
+        )}
+        
+        {error && (
+           <div className="flex justify-center items-center h-64 text-red-500">
+             <p>Erro ao carregar dados: {error}</p>
+           </div>
+        )}
+
+        {!isLoading && !error && (
+          <Table aria-label="Tabela de membros">
+            <TableHeader className="bg-gray-100 text-gray-600 uppercase text-xs">
+              <TableColumn>ID</TableColumn>
+              <TableColumn>NOME</TableColumn>
+              <TableColumn>ANIVERSÁRIO</TableColumn>
+              <TableColumn>TELEFONE</TableColumn>
+              <TableColumn>ENDEREÇO</TableColumn>
+              <TableColumn>CPF</TableColumn>
+              <TableColumn>CARGO</TableColumn>
+              <TableColumn>AÇÕES</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={"Nenhum membro encontrado. Clique em 'Novo Membro' para cadastrar."}>
+              {paginatedMembers.map((membro) => (
+                <TableRow key={membro.id}>
+                  <TableCell>{membro.id}</TableCell>
+                  <TableCell>{membro.nome}</TableCell>
+                  <TableCell>{membro.dataAniversario}</TableCell>
+                  <TableCell>{membro.telefone}</TableCell>
+                  <TableCell>{membro.endereco}</TableCell>
+                  <TableCell>{membro.cpf}</TableCell>
+                  <TableCell>{membro.cargo}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        isIconOnly
+                        variant="solid"
+                        className="text-white bg-slate-500 hover:bg-slate-600 transition-colors"
+                        aria-label="Editar membro"
+                        onPress={() => handleEditar(membro)}
+                      >
+                        <Pencil size={18} />
+                      </Button>
+                      <Button
+                        isIconOnly
+                        variant="solid"
+                        className="text-white bg-red-400 hover:bg-red-500 transition-colors"
+                        aria-label="Excluir membro"
+                        onPress={() => handleDeletar(membro.id)} 
+                      >
+                        <Trash2 size={18} />
+                      </Button>
+                      <Button
+                        isIconOnly
+                        variant="solid"
+                        className="text-white bg-gray-500 hover:bg-gray-600 transition-colors"
+                        aria-label="Visualizar membro"
+                      >
+                        <Eye size={18} />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       <div className="flex justify-center mt-4">
-        {pages > 1 && (
+        {!isLoading && !error && pages > 1 && (
           <Pagination
             isCompact
             showControls
@@ -419,17 +325,17 @@ export default function TabelaMembros() {
           />
         )}
       </div>
+      
       <ModalEditarMembro
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         member={selectedMember}
-        onSave={handleSalvarAlteracoes}
+        onSave={handleSalvarAlteracoes} 
       />
-      {/* NOVO: 5. Renderizar o novo modal de adição */}
       <ModalAdicionarMembro
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSave={handleAdicionarMembro}
+        onSave={handleAdicionarMembro} 
       />
     </div>
   );

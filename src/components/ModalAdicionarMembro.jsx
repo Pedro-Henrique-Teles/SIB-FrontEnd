@@ -9,84 +9,66 @@ import {
     Button,
 } from "@heroui/react";
 import { validateMember } from "../utils/validation";
-import { useToast } from "./ui/ToastProvider";
 import { formatDateBR, formatPhoneBR, formatCPFBR } from "../utils/formatters";
 
-// Estado inicial do formulário para um novo membro
+// Estado inicial do formulário (sem sexo e senha)
 const initialFormData = {
     nome: "",
     dataAniversario: "",
-    sexo: "",
     telefone: "",
     endereco: "",
     cpf: "",
-    email: "", // Adicionado com base nos Inputs do ModalEditarMembro
-    // Adicione outros campos necessários aqui
+    email: "", 
+    cargo: "",
 };
 
-// O componente 'member' será desnecessário, mas mantemos 'onSave'
 export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
-    // Começa com o estado inicial vazio
     const [formData, setFormData] = React.useState(initialFormData);
     const [errors, setErrors] = React.useState({});
-    const { showToast } = useToast();
-
-    // 2. Função de validação
+    
     const validate = () => {
-        const tempErrors = validateMember(formData);
+        const tempErrors = validateMember(formData); 
         setErrors(tempErrors);
-        // Retorna true se não houver erros (objeto de erros está vazio)
         return Object.keys(tempErrors).length === 0;
     };
 
-    // Limpa o formulário E OS ERROS quando o modal é aberto
     React.useEffect(() => {
         if (isOpen) {
             setFormData(initialFormData);
-            setErrors({}); // Limpa os erros ao abrir
+            setErrors({}); 
         }
     }, [isOpen]);
 
-    // Atualiza o estado e limpa o erro do campo específico ao digitar
     const handleChange = (campo, valor) => {
         setFormData((anterior) => ({ ...anterior, [campo]: valor }));
-        
-        // Limpa o erro do campo que está sendo editado
         if (errors[campo]) {
             setErrors((prevErrors) => {
                 const newErrors = { ...prevErrors };
-                delete newErrors[campo]; // Remove a chave do erro
+                delete newErrors[campo]; 
                 return newErrors;
             });
         }    
     };
 
-    // Formata automaticamente a data no formato dd/mm/aaaa
+    // Funções de máscara
     const handleChangeData = (valor) => {
         const masked = formatDateBR(valor);
         handleChange("dataAniversario", masked);
     };
-
     const handleChangeTelefone = (valor) => {
         const masked = formatPhoneBR(valor);
         handleChange("telefone", masked);
     };
-
     const handleChangeCPF = (valor) => {
         const masked = formatCPFBR(valor);
         handleChange("cpf", masked);
     };
 
-    // Ao salvar, primeiro valida
     const handleSalvar = () => {
         if (validate()) {
             onSave(formData);
-            showToast("Membro adicionado com sucesso!", "success");
-            // O useEffect já vai limpar o form ao fechar/abrir
             onClose(); 
         } else {
-            // Se não passar, a função validate() já atualizou o estado 'errors',
-            // e os inputs exibirão as mensagens automaticamente.
             console.log("Falha na validação.");
         }
     };
@@ -95,20 +77,19 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            size="lg"
+            size="lg" 
             placement="center"
             backdrop="opaque"
             classNames={{
                 backdrop: "backdrop-opac-sm"
             }}
         >
-
             <ModalContent>
                 <ModalHeader className="text-lg font-semibold">
-                    Adicionar Novo Membro {/* Título alterado */}
+                    Adicionar Novo Membro
                 </ModalHeader>
 
-                <ModalBody>
+                <ModalBody className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                         label="Nome Completo"
                         value={formData.nome || ""}
@@ -141,21 +122,31 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
                         label="CPF"
                         value={formData.cpf || ""}
                         onValueChange={handleChangeCPF}
-                        onChange={(e) => handleChangeCPF(e.target.value)}
                         inputMode="numeric"
-                        pattern="\d*"
-                        maxLength={14}
+                        maxLength={14} // 123.456.789-00
                         isInvalid={!!errors.cpf}
                         errorMessage={errors.cpf}
                     />
-                    <Input
+                     <Input
                         label="Endereço"
                         value={formData.endereco || ""}
                         onValueChange={(val) => handleChange("endereco", val)}
                         isInvalid={!!errors.endereco}
                         errorMessage={errors.endereco}
                     />
-                    {/* Inclua outros Inputs conforme necessário */}
+                    
+                     <Input
+                        label="Cargo"
+                        placeholder="Ex: Membro, Diácono"
+                        value={formData.cargo || ""}
+                        onValueChange={(val) => handleChange("cargo", val)}
+                        isInvalid={!!errors.cargo}
+                        errorMessage={errors.cargo}
+                        className="md:col-span-2" // Faz o último campo ocupar a linha inteira
+                    />
+                    
+                    {/* Campos de Sexo e Senha REMOVIDOS do formulário */}
+
                 </ModalBody>
 
                 <ModalFooter>
@@ -166,9 +157,8 @@ export default function ModalAdicionarMembro({ isOpen, onClose, onSave }) {
                         className="text-white bg-[#411616] hover:bg-[#5b2020] transition-colors"
                         onPress={handleSalvar}
                     >
-                        Adicionar Membro {/* Texto do botão alterado */}
+                        Adicionar Membro
                     </Button>
-
                 </ModalFooter>
             </ModalContent>
         </Modal>

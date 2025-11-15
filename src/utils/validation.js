@@ -1,5 +1,4 @@
-
-// Valida se uma data no formato dd/mm/aaaa é real (considera meses, dias e ano bissexto)
+// Valida se uma data no formato dd/mm/aaaa é real (considera meses, dias e ano bissexsto)
 export function isValidDateBR(dateStr) {
     const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dateStr || "");
     if (!match) return false;
@@ -15,7 +14,7 @@ export function isValidDateBR(dateStr) {
     return day <= daysInMonth[month - 1];
 }
 
-// Valida CPF com dígitos verificadores
+// Valida CPF com dígitos verificadores (Não estamos usando, mas é bom manter)
 export function isValidCPF(cpf) {
     if (!cpf) return false;
     const clean = String(cpf).replace(/\D/g, "");
@@ -42,7 +41,8 @@ export function isValidCPF(cpf) {
     return parseInt(clean[10], 10) === dv2;
 }
 
-export const validateMember = (formData) => {
+
+export const validateMember = (formData, isEdit = false) => {
     const tempErrors = {};
     
     if (!formData.nome) {
@@ -51,10 +51,8 @@ export const validateMember = (formData) => {
 
     if (!formData.dataAniversario) {
         tempErrors.dataAniversario = "A data de aniversário é obrigatória.";
-    } else if (!/^\d{2}\/\d{2}\/\d{4}$/.test(formData.dataAniversario)) {
-        tempErrors.dataAniversario = "A data deve estar no formato dd/mm/aaaa.";
-    } else if (!isValidDateBR(formData.dataAniversario)) {
-        tempErrors.dataAniversario = "A data de aniversário é inválida.";
+    } else if (formData.dataAniversario.length !== 10 || !isValidDateBR(formData.dataAniversario)) {
+        tempErrors.dataAniversario = "A data de aniversário é inválida (use dd/mm/aaaa).";
     }
     
     if (!formData.email) {
@@ -63,29 +61,37 @@ export const validateMember = (formData) => {
         tempErrors.email = "O formato do e-mail é inválido.";
     }
 
+    // --- CORREÇÃO AQUI ---
+    // Validar a quantidade de dígitos NUMÉRICOS
     if (!formData.telefone) {
         tempErrors.telefone = "O telefone é obrigatório.";
     } else {
-        const telefoneLimpo = (formData.telefone || "").replace(/[()\s-]/g, "");
-        if (!/^\d{10,11}$/.test(telefoneLimpo)) {
-            tempErrors.telefone = "O telefone deve ter 10 ou 11 dígitos (com DDD).";
+        const telefoneLimpo = (formData.telefone || "").replace(/\D/g, "");
+        if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) { // 10 (fixo) ou 11 (celular)
+            tempErrors.telefone = "O telefone é inválido (preencha DD + número).";
         }
     }
 
     if (!formData.cpf) {
         tempErrors.cpf = "O CPF é obrigatório.";
     } else {
+        // CORREÇÃO AQUI: Validar a quantidade de dígitos NUMÉRICOS
         const cpfDigits = (formData.cpf || "").replace(/\D/g, "");
-        if (!/^\d{11}$/.test(cpfDigits)) {
-            tempErrors.cpf = "O CPF deve conter 11 dígitos.";
-        } else if (!isValidCPF(formData.cpf)) {
-            tempErrors.cpf = "CPF inválido.";
-        }
+        if (cpfDigits.length !== 11) { //
+            tempErrors.cpf = "O CPF é inválido (deve ter 11 dígitos).";
+        } 
     }
+    // --- FIM DA CORREÇÃO ---
 
     if (!formData.endereco) {
         tempErrors.endereco = "O endereço é obrigatório.";
     }
+
+    if (!formData.cargo) {
+        tempErrors.cargo = "O cargo é obrigatório.";
+    }
+    
+    // Validações de 'sexo' e 'password' REMOVIDAS
 
     return tempErrors;
 };
