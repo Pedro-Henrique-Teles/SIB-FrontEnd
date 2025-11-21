@@ -10,10 +10,16 @@ import {
   Input,
   Pagination,
   Spinner,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "@heroui/react";
 import { Pencil, Trash2, Eye, Plus, Search } from "lucide-react";
 import ModalEditarMembro from "../../components/ModalEditarMembro";
 import ModalAdicionarMembro from "../../components/ModalAdicionarMembro";
+import ModalVisualizarMembro from "../../components/ModalVisualizarMembro";
 import { useToast } from "../../components/ui/ToastProvider";
 
 const API_BASE_URL = "http://localhost:3008/api/v1/sibApi/user";
@@ -63,6 +69,12 @@ export default function TabelaMembros() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState(null);
+  const [isConfirmEditOpen, setIsConfirmEditOpen] = useState(false);
+  const [memberToEdit, setMemberToEdit] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [memberToView, setMemberToView] = useState(null);
 
   const { showToast } = useToast();
 
@@ -133,11 +145,19 @@ export default function TabelaMembros() {
     }
   };
 
-  const handleSalvarAlteracoes = async (membroAtualizado) => {
-    try {
-      const membroParaApi = mapFrontToApi(membroAtualizado);
+  const handleSalvarAlteracoesModal = (membroAtualizado) => {
+    setMemberToEdit(membroAtualizado);
+    setIsModalOpen(false);
+    setTimeout(() => setIsConfirmEditOpen(true), 300);
+  };
 
-      const response = await fetch(`${API_BASE_URL}/edit/${membroAtualizado.id}`, {
+  const handleConfirmarEdicao = async () => {
+    if (!memberToEdit) return;
+
+    try {
+      const membroParaApi = mapFrontToApi(memberToEdit);
+
+      const response = await fetch(`${API_BASE_URL}/edit/${memberToEdit.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(membroParaApi),
@@ -151,35 +171,58 @@ export default function TabelaMembros() {
       }
 
       showToast("Alterações salvas com sucesso!", "success");
-      setIsModalOpen(false);
+      setIsConfirmEditOpen(false);
+      setMemberToEdit(null);
       fetchMembros();
     } catch (err) {
       showToast(`Erro ao salvar alterações: ${err.message}`, "error");
     }
   };
 
-  const handleDeletar = async (id) => {
-    if (!window.confirm("Tem certeza que deseja excluir este membro?")) return;
+  const handleCancelarEdicao = () => {
+    setIsConfirmEditOpen(false);
+    setMemberToEdit(null);
+  };
+
+  const handleOpenDeleteModal = (membro) => {
+    setMemberToDelete(membro);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!memberToDelete) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/delete/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/delete/${memberToDelete.id}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error("Erro ao deletar membro");
+        throw new Error("Erro ao desativar membro");
       }
 
-      showToast("Membro excluído com sucesso!", "success");
+      showToast("Membro desativado com sucesso!", "success");
+      setIsDeleteModalOpen(false);
+      setMemberToDelete(null);
       fetchMembros();
     } catch (err) {
-      showToast("Função de deletar ainda não implementada no backend", "error");
+      showToast(`Erro ao desativar membro: ${err.message}`, "error");
     }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setMemberToDelete(null);
   };
 
   const handleEditar = (membro) => {
     setSelectedMember(membro);
     setIsModalOpen(true);
+  };
+
+  const handleVisualizar = (membro) => {
+    setMemberToView(membro);
+    setIsViewModalOpen(true);
   };
 
   const onSearchChange = useCallback(
@@ -287,16 +330,17 @@ export default function TabelaMembros() {
                         isIconOnly
                         variant="solid"
                         className="text-white bg-red-400 hover:bg-red-500 transition-colors"
-                        aria-label="Excluir membro"
-                        onPress={() => handleDeletar(membro.id)}
+                        aria-label="Desativar membro"
+                        onPress={() => handleOpenDeleteModal(membro)}
                       >
                         <Trash2 size={18} />
                       </Button>
                       <Button
                         isIconOnly
                         variant="solid"
-                        className="text-white bg-gray-500 hover:bg-gray-600 transition-colors"
+                        className="text-white bg-blue-500 hover:bg-blue-600 transition-colors"
                         aria-label="Visualizar membro"
+                        onPress={() => handleVisualizar(membro)}
                       >
                         <Eye size={18} />
                       </Button>
@@ -331,7 +375,7 @@ export default function TabelaMembros() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         member={selectedMember}
-        onSave={handleSalvarAlteracoes}
+        onSave={handleSalvarAlteracoesModal}
       />
 
       <ModalAdicionarMembro
@@ -339,6 +383,79 @@ export default function TabelaMembros() {
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleAdicionarMembro}
       />
+
+      <ModalVisualizarMembro
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        member={memberToView}
+      />
+
+      <Modal
+        isOpen={isConfirmEditOpen}
+        onClose={handleCancelarEdicao}
+        placement="center"
+        backdrop="opaque"
+        classNames={{ backdrop: "backdrop-opac-sm" }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-lg font-semibold">
+            Confirmar alterações
+          </ModalHeader>
+          <ModalBody>
+            <p>Deseja confirmar as alterações deste membro?</p>
+            <div className="text-sm text-gray-600 space-y-1 mt-3">
+              <p><strong>Nome:</strong> {memberToEdit?.nome || "—"}</p>
+              <p><strong>E-mail:</strong> {memberToEdit?.email || "—"}</p>
+              <p><strong>Telefone:</strong> {memberToEdit?.telefone || "—"}</p>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={handleCancelarEdicao}>
+              Voltar
+            </Button>
+            <Button
+              className="text-white bg-[#411616] hover:bg-[#5b2020] transition-colors"
+              onPress={handleConfirmarEdicao}
+            >
+              Confirmar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCancelDelete}
+        placement="center"
+        backdrop="opaque"
+        classNames={{ backdrop: "backdrop-opac-sm" }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-lg font-semibold">
+            Confirmar desativação
+          </ModalHeader>
+          <ModalBody>
+            <p>
+              Tem certeza que deseja desativar o membro{" "}
+              <strong>"{memberToDelete?.nome}"</strong>?
+            </p>
+            <p className="text-sm text-gray-600 mt-2">
+              O membro será desativado e não aparecerá mais na lista.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={handleCancelDelete}>
+              Cancelar
+            </Button>
+            <Button
+              className="text-white bg-[#411616] hover:bg-[#5b2020] transition-colors"
+              onPress={handleConfirmDelete}
+            >
+              Desativar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
