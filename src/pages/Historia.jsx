@@ -12,7 +12,14 @@ export const Historia = () => {
       <div className="w-full md:w-[75%] bg-gradient-to-r from-[#571f1f] via-[#2b0717] to-black flex items-center justify-center p-4 md:p-8">
         <div className="text-white text-center md:text-left text-base sm:text-xl md:text-2xl lg:text-3xl space-y-8 px-4 sm:px-8 md:px-12 lg:px-16 py-[16rem]">
           <p className="mb-4">
-            A Igreja  começou com um grupo de irmãos se reunindo na casa do .... <br /> O desafio era plantar uma igreja no bairro .... <br /> O bairro <br /> No início de 19..., o grupo de irmãos abriu as atividades ao público, no bairro.
+            Pela bondade de Deus, alguns irmãos
+            começaram a se reunir na casa do irmão
+            Loeocádio, na Rua Pedro Botti. Organizandose como igreja no dia 15 de novembro de
+            1958. No dia 6 de março de 1960, houve uma
+            assembleia extraordinária para a dedicação
+            do edifício religioso na Rua Barão de São
+            Marcelino, e o Pastor Antônio Bispo da Luz
+            recebeu a chave.         
           </p>
         </div>
       </div>

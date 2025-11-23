@@ -1,5 +1,4 @@
 import { Historia } from "../Historia";
-import { Objetivos } from "../Objetivos";
 import { PaginaPrincipal } from "../PaginaPrincipal";
 import { Cabecalho } from "../../components/ui/Cabecalho";
 import { Sobre } from "../Sobre";
@@ -7,7 +6,6 @@ import { FormularioMembros } from "../FormularioMembros";
 import { MapaIgreja } from "../MapaIgreja";
 import { Programacao } from "../Programacao";
 import { useRef } from "react";
-import { Valores } from "../Valores";
 import { Galeria } from "../Galeria";
 function Home() {
   const irParaOTopo = () => window.scrollTo(0, 0);
@@ -61,12 +59,6 @@ function Home() {
       </div>
       <div ref={sobreRef}>
         <Sobre />
-      </div>
-      <div ref={visaoRef}>
-        <Objetivos />
-      </div>
-      <div ref={valoresRef}>
-        <Valores />
       </div>
       <div ref={galeriaRef}>
         <Galeria />
