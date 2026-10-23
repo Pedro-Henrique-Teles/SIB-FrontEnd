@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -22,7 +23,7 @@ export const MapaIgreja = () => {
           </Marker>
         </MapContainer>
       </div>
-      <div className="bg-black text-white p-4 flex justify-around shrink-0">
+      <div className="bg-black text-white p-4 flex flex-col sm:flex-row items-center justify-around gap-4 shrink-0 border-t border-neutral-800">
         <div className="text-center">
           <p className="font-bold">CONTATO</p>
           <p>📞 (32) 3215-9276</p>
@@ -31,7 +32,20 @@ export const MapaIgreja = () => {
           <p className="font-bold">ENDEREÇO</p>
           <p>R. Barão de São Marcelino, 426 - Passos, MG</p>
         </div>
+        <div className="text-center text-xs text-neutral-400 flex flex-col items-center gap-1">
+          <div className="flex gap-3">
+            <Link to="/termos" className="hover:text-white underline underline-offset-2 transition">
+              Termos de Serviço
+            </Link>
+            <span>•</span>
+            <Link to="/privacidade" className="hover:text-white underline underline-offset-2 transition">
+              Política de Privacidade
+            </Link>
+          </div>
+          <span>&copy; {new Date().getFullYear()} SIB-JF</span>
+        </div>
       </div>
     </div>
   );
 };
+
