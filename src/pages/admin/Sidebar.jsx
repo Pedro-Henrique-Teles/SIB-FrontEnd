@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 // MUDANÇA 1: Aceita 'isMobile' e define o padrão como 'false'
-export default function Sidebar({ open, setOpen, isMobile = false }) {
+export default function Sidebar({ open, _setOpen, isMobile = false }) {
   const location = useLocation();
 
   const menus = [
@@ -91,6 +91,15 @@ export default function Sidebar({ open, setOpen, isMobile = false }) {
           <p className="mt-2 font-semibold">
             Ambiente em conformidade com a LGPD.
           </p>
+          <div className="flex gap-2 mt-2 text-[11px] text-gray-400">
+            <Link to="/termos" className="hover:text-white underline transition">
+              Termos
+            </Link>
+            <span>•</span>
+            <Link to="/privacidade" className="hover:text-white underline transition">
+              Privacidade
+            </Link>
+          </div>
         </div>
 
         <button
